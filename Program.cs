@@ -1,4 +1,6 @@
 using api.Data;
+using api.Interfaces;
+using api.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +14,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
+
+
+// Register the StockRepository, IStockRepository. This is the dependency injection container that will be used to inject the StockRepository into the StockController
+builder.Services.AddScoped<IStockRepository, StockRepository>();
 
 var app = builder.Build();
 

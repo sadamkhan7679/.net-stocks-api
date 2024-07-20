@@ -1,4 +1,5 @@
 ﻿using api.Data;
+using api.Interfaces;
 using api.Mappers;
 using api.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -9,75 +10,109 @@ namespace api.Controllers;
 [ApiController]
 public class StockController: ControllerBase
 {
+    // Bring in the ApplicationDbContext
     readonly ApplicationDbContext _dbContext;
-    public StockController(ApplicationDbContext dbContext)
+    
+    // Bring in StockRepository
+    private readonly IStockRepository _stockRepository;
+    
+    // Inject the ApplicationDbContext into the constructor
+    public StockController(ApplicationDbContext dbContext, IStockRepository stockRepository)
     {
-       this._dbContext = dbContext;
+        // Inject the ApplicationDbContext into the constructor
+        _dbContext = dbContext;
+        // Inject the StockRepository into the constructor
+        _stockRepository = stockRepository;
     }
     
     
+    // Implement the GetAll method
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var stocks = await _dbContext.Stocks.ToListAsync();
+        // Call the GetAllStocksAsync method from the StockRepository
+        var stocks = await _stockRepository.GetAllStocksAsync();
         
+        // Map the Stock model to the StockDto
         var stockDtos = stocks.Select(stock => stock.ToStockDto());
+        
+        // Return the StockDto
         return Ok(stockDtos);
     }
     
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById([FromRoute] int id)
     {
-        var stock = await _dbContext.Stocks.FindAsync(id);
+        // Call the GetStockByIdAsync method from the StockRepository
+        var stock = await _stockRepository.GetStockByIdAsync(id);
+        
+        // If the stock is not found, return NotFound
         if(stock == null)
         {
             return NotFound();
         }
-        return Ok(stock.ToStockDto());
+        
+        // Map the Stock model to the StockDto
+        var stockDto = stock.ToStockDto();
+        
+        // Return the StockDto
+        return Ok(stockDto);
     }
     
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] DTOs.Stock.StockDto createStockRequestDto)
     
     {
-        var stock = createStockRequestDto.ToStockModel();
-        await _dbContext.Stocks.AddAsync(stock);
-        await _dbContext.SaveChangesAsync();
-        // return CreatedAtRoute("GetStock", new {id = stock.Id}, stock.ToStockDto());
-        return CreatedAtAction(nameof(GetById), new {id = stock.Id}, stock.ToStockDto());
+        // Map the StockDto to the Stock model
+        var stockModel = createStockRequestDto.ToStockModel();
+        
+        // Call the CreateStockAsync method from the StockRepository
+        var stock = await _stockRepository.CreateStockAsync(stockModel);
+        
+        // Map the Stock model to the StockDto
+        var stockDto = stock.ToStockDto();
+        
+        // Return the StockDto
+        return Ok(stockDto);
     }
     
     
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateStock([FromRoute] int id, [FromBody] DTOs.Stock.UpdateStockRequestDto updateStockRequestDto)
     {
-        var stock = await _dbContext.Stocks.FindAsync(id);
+        // Call the UpdateStockAsync method from the StockRepository
+        var stock = await _stockRepository.UpdateStockAsync(id, updateStockRequestDto);
+        
+        // If the stock is not found, return NotFound
         if(stock == null)
         {
             return NotFound();
         }
-        stock.Symbol = updateStockRequestDto.Symbol;
-        stock.CompanyName = updateStockRequestDto.CompanyName;
-        stock.Purchase = updateStockRequestDto.Purchase;
-        stock.LastDiv = updateStockRequestDto.LastDiv;
-        stock.Industry = updateStockRequestDto.Industry;
-        stock.MarketCap = updateStockRequestDto.MarketCap;
         
-        await   _dbContext.SaveChangesAsync();
-        return Ok(stock.ToStockDto());
+        // Map the Stock model to the StockDto
+        var stockDto = stock.ToStockDto();
+        
+        // Return the StockDto
+        return Ok(stockDto);
     }
     
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteStock([FromRoute] int id)
     {
-        var stock = await _dbContext.Stocks.FindAsync(id);
+        // Call the DeleteStockAsync method from the StockRepository
+        var stock = await _stockRepository.DeleteStockAsync(id);
+        
+        // If the stock is not found, return NotFound
         if(stock == null)
         {
             return NotFound();
         }
-        _dbContext.Stocks.Remove(stock);
-        await _dbContext.SaveChangesAsync();
-        return NoContent();
+        
+        // Map the Stock model to the StockDto
+        var stockDto = stock.ToStockDto();
+        
+        // Return the StockDto
+        return Ok(stockDto);
     }
     
     
