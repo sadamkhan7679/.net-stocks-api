@@ -3,6 +3,7 @@ using api.Data;
 using api.Interfaces;
 using api.Models;
 using api.Repository;
+using api.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -74,6 +75,11 @@ builder.Services.AddScoped<IStockRepository, StockRepository>();
 
 // Register the CommentRepository, ICommentRepository. This is the dependency injection container that will be used to inject the CommentRepository into the CommentController
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+
+// Register the TokenService, ITokenService. This is the dependency injection container that will be used to inject the TokenService into the AccountController
+builder.Services.AddScoped<ITokenService, TokenService>();
+
+
 
 var app = builder.Build();
 
