@@ -63,6 +63,11 @@ public class StockController: ControllerBase
     public async Task<IActionResult> Create([FromBody] DTOs.Stock.StockDto createStockRequestDto)
     
     {
+        // If the model state is not valid, return BadRequest
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
         // Map the StockDto to the Stock model
         var stockModel = createStockRequestDto.ToStockModel();
         
@@ -80,6 +85,11 @@ public class StockController: ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateStock([FromRoute] int id, [FromBody] DTOs.Stock.UpdateStockRequestDto updateStockRequestDto)
     {
+        // If the model state is not valid, return BadRequest
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
         // Call the UpdateStockAsync method from the StockRepository
         var stock = await _stockRepository.UpdateStockAsync(id, updateStockRequestDto);
         

@@ -54,7 +54,7 @@ public class CommentController : ControllerBase
     ///     <param name="id">The comment Id</param>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation with an <see cref="IActionResult"/> result containing the comment.</returns>
     ///
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public async Task<IActionResult> GetCommentById([FromRoute] int id)
     {
         var comment = await _commentRepo.GetCommentByIdAsync(id);
@@ -76,9 +76,13 @@ public class CommentController : ControllerBase
     ///     <param name="stockId">The stock Id</param>
     ///     <returns>A <see cref="Task"/> representing the asynchronous operation with an <see cref="IActionResult"/> result containing the created comment.</returns>
     
-    [HttpPost("{stockId}")]
+    [HttpPost("{stockId:int}")]
     public async Task<IActionResult> CreateComment([FromBody] CreateCommentRequestDto createCommentRequestDto, [FromRoute] int stockId)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
         var stock = await _stockRepository.StockExistsAsync(stockId);
 
         if (!stock)
@@ -86,6 +90,7 @@ public class CommentController : ControllerBase
             return BadRequest("Stock does not exist");
         }
 
+        
         var comment = createCommentRequestDto.ToCommentModel(stockId);
         comment.StockId = stockId;
         
@@ -102,9 +107,13 @@ public class CommentController : ControllerBase
     ///     <param name="updateCommentRequestDto">The comment to update</param>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation with an <see cref="IActionResult"/> result containing the updated comment.</returns>
     
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     public async Task<IActionResult> UpdateComment([FromRoute] int id, [FromBody] UpdateCommentRequestDto updateCommentRequestDto)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
         var comment = await _commentRepo.GetCommentByIdAsync(id);
 
         if (comment == null)
@@ -129,7 +138,7 @@ public class CommentController : ControllerBase
     ///     <param name="id">The comment Id</param>
     ///     <returns>A <see cref="Task"/> representing the asynchronous operation with an <see cref="IActionResult"/> result containing the deleted comment.</returns>
     
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteComment([FromRoute] int id)
     {
         var comment = await _commentRepo.GetCommentByIdAsync(id);
