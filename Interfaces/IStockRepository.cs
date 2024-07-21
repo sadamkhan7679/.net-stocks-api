@@ -32,4 +32,11 @@ public interface IStockRepository
     Task<Stock?> DeleteStockAsync(int id);
     
     
+    /*
+     * Check if a stock exists. This will return a boolean value
+     */
+    
+    Task<bool> StockExistsAsync(int id);
+    
+    
 }

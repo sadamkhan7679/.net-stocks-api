@@ -1,4 +1,5 @@
 ﻿using api.Data;
+using api.Dtos.Comment;
 using api.Interfaces;
 using api.Mappers;
 using api.Models;
@@ -14,21 +15,22 @@ namespace api.Controllers;
 [ApiController]
 public class CommentController : ControllerBase
 {
-    // Database context for entity framework operations
-    readonly ApplicationDbContext _dbContext;
 
     // Repository for comment-related data operations
     private readonly ICommentRepository _commentRepo;
+    
+    // Repository for stock-related data operations
+    private readonly IStockRepository _stockRepository;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CommentController"/> class.
     /// </summary>
-    /// <param name="dbContext">The database context.</param>
     /// <param name="commentRepo">The comment repository.</param>
-    public CommentController(ApplicationDbContext dbContext, ICommentRepository commentRepo)
+    /// <param name="stockRepository">The stock repository.</param>
+    public CommentController( ICommentRepository commentRepo, IStockRepository stockRepository)
     {
-        _dbContext = dbContext;
         _commentRepo = commentRepo;
+        _stockRepository = stockRepository;
     }
 
     /// <summary>
@@ -65,5 +67,30 @@ public class CommentController : ControllerBase
         var commentDto = comment.ToCommentDto();
 
         return Ok(commentDto);
+    }
+    
+    /// <summary>
+    /// Create a new comment
+    /// </summary>
+    ///     <param name="createCommentRequestDto">The comment to create</param>
+    ///     <returns>A <see cref="Task"/> representing the asynchronous operation with an <see cref="IActionResult"/> result containing the created comment.</returns>
+    
+    [HttpPost("{stockId}")]
+    public async Task<IActionResult> CreateComment([FromBody] CreateCommentRequestDto createCommentRequestDto, [FromRoute] int stockId)
+    {
+        var stock = await _stockRepository.StockExistsAsync(stockId);
+
+        if (!stock)
+        {
+            return BadRequest("Stock does not exist");
+        }
+
+        var comment = createCommentRequestDto.ToCommentModel(stockId);
+        comment.StockId = stockId;
+        
+
+        await _commentRepo.CreateCommentAsync(comment);
+
+        return CreatedAtAction(nameof(GetCommentById), new { id = comment.Id }, comment.ToCommentDto());
     }
 }

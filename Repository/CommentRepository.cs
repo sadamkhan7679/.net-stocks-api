@@ -24,5 +24,11 @@ public class CommentRepository:ICommentRepository
         return _dbContext.Comments.FirstOrDefaultAsync(c => c.Id == id);
     }
     
+    public async Task<Comment> CreateCommentAsync(Comment commentModel)
+    {
+        await _dbContext.Comments.AddAsync(commentModel);
+        await _dbContext.SaveChangesAsync();
+        return commentModel;
+    }
     
 }
