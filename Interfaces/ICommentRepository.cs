@@ -10,4 +10,8 @@ public interface ICommentRepository
     
     Task<Comment> CreateCommentAsync(Comment commentModel);
     
+    Task<Comment?> UpdateCommentAsync(int id, Comment commentModel);
+    
+    Task<Comment?> DeleteCommentAsync(int id);
+    
 }

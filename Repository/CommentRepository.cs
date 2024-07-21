@@ -1,5 +1,6 @@
 ﻿using api.Data;
 using api.Interfaces;
+using api.Mappers;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,6 +30,35 @@ public class CommentRepository:ICommentRepository
         await _dbContext.Comments.AddAsync(commentModel);
         await _dbContext.SaveChangesAsync();
         return commentModel;
+    }
+    
+    public async Task<Comment?> UpdateCommentAsync(int id, Comment commentModel)
+    {
+        var comment = await _dbContext.Comments.FirstOrDefaultAsync(c => c.Id == id);
+        if(comment == null)
+        {
+            return null;
+        }
+        
+        comment.Title = commentModel.Title;
+        comment.Content = commentModel.Content;
+        
+        await _dbContext.SaveChangesAsync();
+        return comment;
+    }
+    
+    
+    public async Task<Comment?> DeleteCommentAsync(int id)
+    {
+        var comment = await _dbContext.Comments.FirstOrDefaultAsync(c => c.Id == id);
+        if(comment == null)
+        {
+            return null;
+        }
+        
+        _dbContext.Comments.Remove(comment);
+        await _dbContext.SaveChangesAsync();
+        return comment;
     }
     
 }

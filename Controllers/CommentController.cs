@@ -73,6 +73,7 @@ public class CommentController : ControllerBase
     /// Create a new comment
     /// </summary>
     ///     <param name="createCommentRequestDto">The comment to create</param>
+    ///     <param name="stockId">The stock Id</param>
     ///     <returns>A <see cref="Task"/> representing the asynchronous operation with an <see cref="IActionResult"/> result containing the created comment.</returns>
     
     [HttpPost("{stockId}")]
@@ -92,5 +93,59 @@ public class CommentController : ControllerBase
         await _commentRepo.CreateCommentAsync(comment);
 
         return CreatedAtAction(nameof(GetCommentById), new { id = comment.Id }, comment.ToCommentDto());
+    }
+    
+    /// <summary>
+    /// Update a comment
+    /// </summary>
+    ///     <param name="id">The comment Id</param>
+    ///     <param name="updateCommentRequestDto">The comment to update</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation with an <see cref="IActionResult"/> result containing the updated comment.</returns>
+    
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateComment([FromRoute] int id, [FromBody] UpdateCommentRequestDto updateCommentRequestDto)
+    {
+        var comment = await _commentRepo.GetCommentByIdAsync(id);
+
+        if (comment == null)
+        {
+            return NotFound();
+        }
+
+        var updatedComment = updateCommentRequestDto.ToCommentModel();
+        var result = await _commentRepo.UpdateCommentAsync(id, updatedComment);
+
+        if (result == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(result.ToCommentDto());
+    }
+    
+    /// <summary>
+    ///     Delete a comment
+    ///     </summary>
+    ///     <param name="id">The comment Id</param>
+    ///     <returns>A <see cref="Task"/> representing the asynchronous operation with an <see cref="IActionResult"/> result containing the deleted comment.</returns>
+    
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteComment([FromRoute] int id)
+    {
+        var comment = await _commentRepo.GetCommentByIdAsync(id);
+
+        if (comment == null)
+        {
+            return NotFound();
+        }
+
+        var result = await _commentRepo.DeleteCommentAsync(id);
+
+        if (result == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(result.ToCommentDto());
     }
 }
