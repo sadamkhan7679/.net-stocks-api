@@ -45,7 +45,8 @@ public class StockRepository: IStockRepository
                 stocks = query.IsAscending ? stocks.OrderBy(stock => stock.CompanyName) : stocks.OrderByDescending(stock => stock.CompanyName);
             }
         }
-        
+        // Add Pagination
+        stocks = stocks.Skip((query.Page - 1) * query.PageSize).Take(query.PageSize);
         
         return stocks.ToListAsync();
     }
