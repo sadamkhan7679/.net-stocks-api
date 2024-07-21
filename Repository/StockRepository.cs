@@ -34,6 +34,19 @@ public class StockRepository: IStockRepository
             stocks = stocks.Where(stock => stock.CompanyName.Contains(query.CompanyName));
         }
         
+        if(query.SortBy != null)
+        {
+            if(query.SortBy == SortByFields.Symbol)
+            {
+                stocks = query.IsAscending ? stocks.OrderBy(stock => stock.Symbol) : stocks.OrderByDescending(stock => stock.Symbol);
+            }
+            else if(query.SortBy == SortByFields.CompanyName)
+            {
+                stocks = query.IsAscending ? stocks.OrderBy(stock => stock.CompanyName) : stocks.OrderByDescending(stock => stock.CompanyName);
+            }
+        }
+        
+        
         return stocks.ToListAsync();
     }
 
