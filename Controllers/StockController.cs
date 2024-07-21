@@ -1,4 +1,5 @@
 ﻿using api.Data;
+using api.Helpers;
 using api.Interfaces;
 using api.Mappers;
 using api.Models;
@@ -28,10 +29,10 @@ public class StockController: ControllerBase
     
     // Implement the GetAll method
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
     {
         // Call the GetAllStocksAsync method from the StockRepository
-        var stocks = await _stockRepository.GetAllStocksAsync();
+        var stocks = await _stockRepository.GetAllStocksAsync(query);
         
         // Map the Stock model to the StockDto
         var stockDtos = stocks.Select(stock => stock.ToStockDto());

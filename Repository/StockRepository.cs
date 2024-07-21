@@ -1,5 +1,6 @@
 ﻿using api.Data;
 using api.DTOs.Stock;
+using api.Helpers;
 using api.Interfaces;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -18,9 +19,22 @@ public class StockRepository: IStockRepository
     }
     
     // Implement the methods from the IStockRepository interface
-    public Task<List<Stock>> GetAllStocksAsync()
+    public Task<List<Stock>> GetAllStocksAsync(QueryObject query)
     {
-        return _dbContext.Stocks.Include(c => c.Comments).ToListAsync();
+        // return _dbContext.Stocks.Include(c => c.Comments).ToListAsync();
+        var stocks = _dbContext.Stocks.AsQueryable();
+        
+        if(!string.IsNullOrWhiteSpace(query.Symbol))
+        {
+            stocks = stocks.Where(stock => stock.Symbol.Contains(query.Symbol));
+        }
+        
+        if(!string.IsNullOrWhiteSpace(query.CompanyName))
+        {
+            stocks = stocks.Where(stock => stock.CompanyName.Contains(query.CompanyName));
+        }
+        
+        return stocks.ToListAsync();
     }
 
     public Task<Stock?> GetStockByIdAsync(int id)

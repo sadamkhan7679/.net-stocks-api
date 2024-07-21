@@ -1,5 +1,6 @@
 ﻿using api.DTOs.Stock;
 using api.Models;
+using api.Helpers;
 
 namespace api.Interfaces;
 
@@ -9,7 +10,7 @@ public interface IStockRepository
     // Define the methods that will be implemented in the StockRepository
     
     // Get all stocks. This will return a list of stocks
-    Task<List<Stock>> GetAllStocksAsync();
+    Task<List<Stock>> GetAllStocksAsync(QueryObject query);
     
     /* Get a stock by its id. This will return a stock. The id will be passed as a parameter
      Stock? is used to return a stock or null if the stock is not found. This is a nullable type
