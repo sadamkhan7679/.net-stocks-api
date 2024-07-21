@@ -20,12 +20,12 @@ public class StockRepository: IStockRepository
     // Implement the methods from the IStockRepository interface
     public Task<List<Stock>> GetAllStocksAsync()
     {
-        return _dbContext.Stocks.ToListAsync();
+        return _dbContext.Stocks.Include(c => c.Comments).ToListAsync();
     }
 
     public Task<Stock?> GetStockByIdAsync(int id)
     {
-        return _dbContext.Stocks.FindAsync(id).AsTask();
+        return _dbContext.Stocks.Include(c => c.Comments).FirstOrDefaultAsync(stock => stock.Id == id);
     }
     
     public async Task<Stock> CreateStockAsync(Stock stockModel)
