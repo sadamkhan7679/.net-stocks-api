@@ -1,9 +1,10 @@
 ﻿using api.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.Data;
 
-public class ApplicationDbContext: DbContext
+public class ApplicationDbContext: IdentityDbContext<AppUser>
 {
     public ApplicationDbContext(
         DbContextOptions<ApplicationDbContext> options
@@ -14,8 +15,10 @@ public class ApplicationDbContext: DbContext
     }
     
     
+    // Add Stock Model to the database
     public DbSet<Stock> Stocks { get; set; } = null!;
     
+    // Add Comment Model to the database
     public DbSet<Comment> Comments { get; set; } = null!;
     
     
